@@ -1,75 +1,79 @@
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { BOMResult } from '@/types/bom';
-import { ROOF_TYPE_LABELS } from '@/data/products';
+import { ROOF_TYPE_LABELS, PROFILE_COLOR_LABELS, HOOK_TYPE_LABELS, PROFILE_TYPE_LABELS, ROOFING_TYPE_LABELS } from '@/data/products';
 
-export const exportBOMToPDF = (result: BOMResult): void => {
+export const exportBOMToPDF = (result: BOMResult) => {
   const doc = new jsPDF();
   const pageWidth = doc.internal.pageSize.getWidth();
-  
+
   // Header
-  doc.setFillColor(30, 58, 95); // Dark blue
+  doc.setFillColor(30, 58, 95);
   doc.rect(0, 0, pageWidth, 40, 'F');
-  
+
   doc.setTextColor(255, 255, 255);
   doc.setFontSize(24);
   doc.setFont('helvetica', 'bold');
-  doc.text('AXXIOM', 14, 20);
-  
-  doc.setFontSize(12);
-  doc.setFont('helvetica', 'normal');
-  doc.text('Solar Mounting Systems', 14, 30);
-  
+  doc.text('Axxiom Solar', 14, 20);
+
   doc.setFontSize(14);
-  doc.text('Materialenlijst (BOM)', pageWidth - 14, 25, { align: 'right' });
-  
+  doc.setFont('helvetica', 'normal');
+  doc.text('Bill of Materials (BOM)', 14, 32);
+
   // Date
-  const today = new Date().toLocaleDateString('nl-NL', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  });
   doc.setFontSize(10);
-  doc.text(today, pageWidth - 14, 35, { align: 'right' });
-  
+  doc.text(`Date: ${new Date().toLocaleDateString('en-GB')}`, pageWidth - 14, 20, { align: 'right' });
+
+  // Reset text color
+  doc.setTextColor(0, 0, 0);
+
   // Configuration Summary
-  doc.setTextColor(30, 58, 95);
-  doc.setFontSize(14);
+  let yPos = 55;
+  doc.setFontSize(12);
   doc.setFont('helvetica', 'bold');
-  doc.text('Configuratie Overzicht', 14, 55);
-  
-  doc.setTextColor(60, 60, 60);
+  doc.text('Configuration Summary', 14, yPos);
+
+  yPos += 8;
   doc.setFontSize(10);
   doc.setFont('helvetica', 'normal');
-  
-  const configData = [
-    ['Daktype:', ROOF_TYPE_LABELS[result.config.roof.roofType]],
-    ['Totaal Panelen:', `${result.totalPanels}`],
-    ['Oriëntatie:', result.config.panel.orientation === 'landscape' ? 'Liggend' : 'Staand'],
-    ['Paneel Afmetingen:', `${result.config.panel.height} x ${result.config.panel.width} x ${result.config.panel.thickness} mm`],
-    ['Layout:', `${result.config.panel.rows} rijen x ${result.config.panel.columns} kolommen`],
-    ['Profiel Kleur:', result.config.roof.profileColor === 'alu' ? 'Aluminium' : 'Zwart'],
-    ['Klem Kleur:', result.config.roof.clampColor === 'alu' ? 'Aluminium' : 'Zwart'],
+
+  const configItems = [
+    ['System Type:', ROOF_TYPE_LABELS[result.config.roof.roofType]],
+    ['Total Panels:', `${result.totalPanels} (${result.config.panel.rows} rows × ${result.config.panel.columns} columns)`],
+    ['Orientation:', result.config.panel.orientation === 'landscape' ? 'Landscape' : 'Portrait'],
+    ['Panel Dimensions:', `${result.config.panel.height} × ${result.config.panel.width} × ${result.config.panel.thickness} mm`],
+    ['Profile Color:', PROFILE_COLOR_LABELS[result.config.roof.profileColor]],
+    ['Clamp Color:', PROFILE_COLOR_LABELS[result.config.roof.clampColor]],
   ];
-  
-  let yPos = 65;
-  configData.forEach(([label, value]) => {
+
+  // Add slanted roof specific info
+  if (result.config.roof.roofingType) {
+    configItems.push(['Roofing Type:', ROOFING_TYPE_LABELS[result.config.roof.roofingType] || '-']);
+  }
+  if (result.config.roof.hookType) {
+    configItems.push(['Hook Type:', HOOK_TYPE_LABELS[result.config.roof.hookType] || '-']);
+  }
+  if (result.config.roof.profileType) {
+    configItems.push(['Profile Type:', PROFILE_TYPE_LABELS[result.config.roof.profileType] || '-']);
+  }
+
+  configItems.forEach(([label, value]) => {
     doc.setFont('helvetica', 'bold');
     doc.text(label, 14, yPos);
     doc.setFont('helvetica', 'normal');
     doc.text(value, 60, yPos);
-    yPos += 7;
+    yPos += 6;
   });
-  
+
   // Materials Table
-  doc.setTextColor(30, 58, 95);
-  doc.setFontSize(14);
+  yPos += 10;
+  doc.setFontSize(12);
   doc.setFont('helvetica', 'bold');
-  doc.text('Materialenlijst', 14, yPos + 10);
-  
+  doc.text('Bill of Materials', 14, yPos);
+
   autoTable(doc, {
-    startY: yPos + 15,
-    head: [['Productcode', 'Omschrijving', 'Benodigd', 'Verpakt', 'Bestellen']],
+    startY: yPos + 5,
+    head: [['Product Code', 'Description', 'Needed', 'Packed', 'Quantity']],
     body: result.items.map((item) => [
       item.productCode,
       item.description,
@@ -81,41 +85,39 @@ export const exportBOMToPDF = (result: BOMResult): void => {
       fillColor: [30, 58, 95],
       textColor: [255, 255, 255],
       fontStyle: 'bold',
-      fontSize: 10,
+      halign: 'left',
     },
     bodyStyles: {
       fontSize: 9,
-      textColor: [60, 60, 60],
-    },
-    alternateRowStyles: {
-      fillColor: [245, 247, 250],
     },
     columnStyles: {
-      0: { fontStyle: 'bold', cellWidth: 35 },
-      1: { cellWidth: 70 },
-      2: { halign: 'center', cellWidth: 25 },
-      3: { halign: 'center', cellWidth: 25 },
-      4: { halign: 'center', cellWidth: 25, fontStyle: 'bold', textColor: [30, 58, 95] },
+      0: { cellWidth: 35, fontStyle: 'bold' },
+      1: { cellWidth: 'auto' },
+      2: { cellWidth: 20, halign: 'center' },
+      3: { cellWidth: 20, halign: 'center' },
+      4: { cellWidth: 25, halign: 'center', fontStyle: 'bold' },
+    },
+    alternateRowStyles: {
+      fillColor: [245, 245, 245],
     },
     margin: { left: 14, right: 14 },
   });
-  
+
   // Footer
   const pageCount = doc.getNumberOfPages();
   for (let i = 1; i <= pageCount; i++) {
     doc.setPage(i);
-    const pageHeight = doc.internal.pageSize.getHeight();
-    
-    doc.setDrawColor(200, 200, 200);
-    doc.line(14, pageHeight - 20, pageWidth - 14, pageHeight - 20);
-    
     doc.setFontSize(8);
     doc.setTextColor(128, 128, 128);
-    doc.text('Dit document is automatisch gegenereerd door de Axxiom BOM Calculator', 14, pageHeight - 12);
-    doc.text(`Pagina ${i} van ${pageCount}`, pageWidth - 14, pageHeight - 12, { align: 'right' });
+    doc.text(
+      `Page ${i} of ${pageCount} - Generated by Axxiom Solar BOM Calculator`,
+      pageWidth / 2,
+      doc.internal.pageSize.getHeight() - 10,
+      { align: 'center' }
+    );
   }
-  
-  // Save PDF
-  const filename = `BOM_Axxiom_${result.totalPanels}panelen_${new Date().toISOString().split('T')[0]}.pdf`;
-  doc.save(filename);
+
+  // Save
+  const timestamp = new Date().toISOString().split('T')[0];
+  doc.save(`Axxiom_BOM_${timestamp}.pdf`);
 };

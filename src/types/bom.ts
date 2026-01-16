@@ -1,4 +1,4 @@
-import { RoofType, HookType, ProfileColor } from '@/data/products';
+import { RoofType, HookType, ProfileColor, ProfileType, RoofingType } from '@/data/products';
 
 export interface PanelConfig {
   height: number; // mm
@@ -11,10 +11,18 @@ export interface PanelConfig {
 
 export interface RoofConfig {
   roofType: RoofType;
+  // Slanted Roof specific
+  roofingType?: RoofingType;
   hookType?: HookType;
-  angle: number;
+  profileType?: ProfileType;
   profileColor: ProfileColor;
   clampColor: ProfileColor;
+  // Flat roof specific
+  angle: number;
+  // Steeldeck specific
+  plateType?: 'plate_15' | 'plate_40' | 'connecting_plate';
+  // Ground mount specific
+  schroefpaalLength?: 750 | 1000 | 1500;
 }
 
 export interface BOMItem {

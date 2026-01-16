@@ -9,46 +9,100 @@ export interface Product {
 
 // Roof Types
 export const ROOF_TYPES = {
+  SLANTED_ROOF: 'slanted_roof',
   ALLFIELD_LANDSCAPE: 'allfield_landscape',
   ALLFIELD_PORTRAIT: 'allfield_portrait',
-  SLANTED_ROOF: 'slanted_roof',
   STEELDECK: 'steeldeck',
   SOLARSPEED_EW: 'solarspeed_ew',
   SOLARSPEED_SOUTH: 'solarspeed_south',
   GROUND_MOUNT: 'ground_mount',
+  STEELDECK_SOLARSPEED_SOUTH: 'steeldeck_solarspeed_south',
+  STEELDECK_TRIANGLE: 'steeldeck_triangle',
+  FLAT_ROOF_TRIANGLE: 'flat_roof_triangle',
 } as const;
 
 export type RoofType = typeof ROOF_TYPES[keyof typeof ROOF_TYPES];
 
 export const ROOF_TYPE_LABELS: Record<RoofType, string> = {
-  [ROOF_TYPES.ALLFIELD_LANDSCAPE]: 'Allfield/Triangle - Landscape',
-  [ROOF_TYPES.ALLFIELD_PORTRAIT]: 'Allfield/Triangle - Portrait',
-  [ROOF_TYPES.SLANTED_ROOF]: 'Hellend Dak',
+  [ROOF_TYPES.SLANTED_ROOF]: 'Slanted Roof',
+  [ROOF_TYPES.ALLFIELD_LANDSCAPE]: 'Allfield - Landscape',
+  [ROOF_TYPES.ALLFIELD_PORTRAIT]: 'Allfield - Portrait',
   [ROOF_TYPES.STEELDECK]: 'Steeldeck',
-  [ROOF_TYPES.SOLARSPEED_EW]: 'Solarspeed - Oost/West',
-  [ROOF_TYPES.SOLARSPEED_SOUTH]: 'Solarspeed - Zuid',
-  [ROOF_TYPES.GROUND_MOUNT]: 'Grondmontage',
+  [ROOF_TYPES.SOLARSPEED_EW]: 'Flat Roof - East/West',
+  [ROOF_TYPES.SOLARSPEED_SOUTH]: 'Flat Roof - South',
+  [ROOF_TYPES.GROUND_MOUNT]: 'Ground Mount',
+  [ROOF_TYPES.STEELDECK_SOLARSPEED_SOUTH]: 'Steeldeck Solarspeed - South',
+  [ROOF_TYPES.STEELDECK_TRIANGLE]: 'Steeldeck Triangle',
+  [ROOF_TYPES.FLAT_ROOF_TRIANGLE]: 'Flat Roof Triangle',
 };
 
-// Hook Types for Slanted Roof
+// Roofing Material Types for Slanted Roof
+export const ROOFING_TYPES = {
+  TILED: 'tiled',
+  SLATES: 'slates',
+  ZINC: 'zinc',
+} as const;
+
+export type RoofingType = typeof ROOFING_TYPES[keyof typeof ROOFING_TYPES];
+
+export const ROOFING_TYPE_LABELS: Record<RoofingType, string> = {
+  [ROOFING_TYPES.TILED]: 'Tiled',
+  [ROOFING_TYPES.SLATES]: 'Slates',
+  [ROOFING_TYPES.ZINC]: 'Zinc',
+};
+
+// Hook Types for Slanted Roof - organized by roofing type
 export const HOOK_TYPES = {
+  // Tiled hooks
   NORMAL: 'normal',
   LONG: 'long',
   HYBRID: 'hybrid',
   OPTIMUM: 'optimum',
-  SLATE: 'slate',
-  ZINC: 'zinc',
+  OPTI_CLASSIC: 'opti_classic',
+  // Slates hooks
+  SLATES_NORMAL: 'slates_normal',
+  // Zinc hooks
+  ZINC_ROUND: 'zinc_round',
+  ZINC_STAND_SEAM: 'zinc_stand_seam',
 } as const;
 
 export type HookType = typeof HOOK_TYPES[keyof typeof HOOK_TYPES];
 
 export const HOOK_TYPE_LABELS: Record<HookType, string> = {
-  [HOOK_TYPES.NORMAL]: 'Dakhaak Normaal',
-  [HOOK_TYPES.LONG]: 'Dakhaak Lang',
-  [HOOK_TYPES.HYBRID]: 'Dakhaak Hybrid',
-  [HOOK_TYPES.OPTIMUM]: 'Dakhaak Optimum',
-  [HOOK_TYPES.SLATE]: 'Leisteen Haak',
-  [HOOK_TYPES.ZINC]: 'Zink Haak',
+  [HOOK_TYPES.NORMAL]: 'Normal (Standard)',
+  [HOOK_TYPES.LONG]: 'Long',
+  [HOOK_TYPES.HYBRID]: 'Hybrid',
+  [HOOK_TYPES.OPTIMUM]: 'Optimum',
+  [HOOK_TYPES.OPTI_CLASSIC]: 'Optimum Classic',
+  [HOOK_TYPES.SLATES_NORMAL]: 'Slates - Normal',
+  [HOOK_TYPES.ZINC_ROUND]: 'Zinc - Round',
+  [HOOK_TYPES.ZINC_STAND_SEAM]: 'Zinc - Stand Seam',
+};
+
+// Hooks grouped by roofing type
+export const HOOKS_BY_ROOFING: Record<RoofingType, HookType[]> = {
+  [ROOFING_TYPES.TILED]: [
+    HOOK_TYPES.NORMAL,
+    HOOK_TYPES.LONG,
+    HOOK_TYPES.HYBRID,
+    HOOK_TYPES.OPTIMUM,
+    HOOK_TYPES.OPTI_CLASSIC,
+  ],
+  [ROOFING_TYPES.SLATES]: [HOOK_TYPES.SLATES_NORMAL],
+  [ROOFING_TYPES.ZINC]: [HOOK_TYPES.ZINC_ROUND, HOOK_TYPES.ZINC_STAND_SEAM],
+};
+
+// Profile Types
+export const PROFILE_TYPES = {
+  HOUSE: 'house',
+  FEATHER: 'feather',
+} as const;
+
+export type ProfileType = typeof PROFILE_TYPES[keyof typeof PROFILE_TYPES];
+
+export const PROFILE_TYPE_LABELS: Record<ProfileType, string> = {
+  [PROFILE_TYPES.HOUSE]: 'House Profile',
+  [PROFILE_TYPES.FEATHER]: 'Feather Profile',
 };
 
 // Profile Colors
@@ -61,7 +115,7 @@ export type ProfileColor = typeof PROFILE_COLORS[keyof typeof PROFILE_COLORS];
 
 export const PROFILE_COLOR_LABELS: Record<ProfileColor, string> = {
   [PROFILE_COLORS.ALU]: 'Aluminium',
-  [PROFILE_COLORS.BLACK]: 'Zwart',
+  [PROFILE_COLORS.BLACK]: 'Black',
 };
 
 // Clamp Types
@@ -73,382 +127,518 @@ export const CLAMP_TYPES = {
 // Angle Options
 export const ANGLE_OPTIONS = [10, 12.5, 15, 20, 25, 30] as const;
 
-// Products Database
+// Products Database - Updated with exact Excel codes
 export const PRODUCTS: Record<string, Product> = {
-  // Schroefpalen (Ground Mount)
-  SCHROEFPAAL_750: {
-    code: '1HGM01DD001',
-    description: 'Schroefpaal 750mm',
-    packagingUnit: 1,
-    category: 'ground_mount',
-  },
-  SCHROEFPAAL_1000: {
-    code: '1HGM01DD002',
-    description: 'Schroefpaal 1000mm',
-    packagingUnit: 1,
-    category: 'ground_mount',
-  },
-  SCHROEFPAAL_1500: {
-    code: '1HGM01DD003',
-    description: 'Schroefpaal 1500mm',
-    packagingUnit: 1,
-    category: 'ground_mount',
-  },
-  
-  // Dakhaken (Roof Hooks)
-  DAKHAAK_NORMAL_ALU: {
-    code: '1HSR01DD001',
-    description: 'Dakhaak Normaal - ALU',
-    packagingUnit: 25,
-    category: 'slanted_roof',
-  },
-  DAKHAAK_NORMAL_BLACK: {
-    code: '1HSR01DD002',
-    description: 'Dakhaak Normaal - Zwart',
-    packagingUnit: 25,
-    category: 'slanted_roof',
-  },
-  DAKHAAK_LONG_ALU: {
-    code: '1HSR02DD001',
-    description: 'Dakhaak Lang - ALU',
-    packagingUnit: 25,
-    category: 'slanted_roof',
-  },
-  DAKHAAK_LONG_BLACK: {
-    code: '1HSR02DD002',
-    description: 'Dakhaak Lang - Zwart',
-    packagingUnit: 25,
-    category: 'slanted_roof',
-  },
-  DAKHAAK_HYBRID_ALU: {
-    code: '1HSR03DD001',
-    description: 'Dakhaak Hybrid - ALU',
-    packagingUnit: 25,
-    category: 'slanted_roof',
-  },
-  DAKHAAK_HYBRID_BLACK: {
-    code: '1HSR03DD002',
-    description: 'Dakhaak Hybrid - Zwart',
-    packagingUnit: 25,
-    category: 'slanted_roof',
-  },
-  DAKHAAK_OPTIMUM_ALU: {
-    code: '1HSR04DD001',
-    description: 'Dakhaak Optimum - ALU',
-    packagingUnit: 25,
-    category: 'slanted_roof',
-  },
-  DAKHAAK_OPTIMUM_BLACK: {
-    code: '1HSR04DD002',
-    description: 'Dakhaak Optimum - Zwart',
-    packagingUnit: 25,
-    category: 'slanted_roof',
-  },
-  
-  // Klemmen (Clamps)
-  KLEM_MIDDEN_30_ALU: {
+  // ===== ROOF HOOKS (Slanted Roof) =====
+  // Tiled - Normal
+  DAKHAAK_NORMAL: {
     code: '1HME15DD001',
-    description: 'Middenklem 30-40mm - ALU',
-    packagingUnit: 20,
-    category: 'clamps',
+    description: 'DAKHAAK DUBBEL VERSTELBAAR RVS',
+    packagingUnit: 30,
+    category: 'slanted_roof',
   },
-  KLEM_MIDDEN_30_BLACK: {
+  // Tiled - Long
+  DAKHAAK_LONG: {
     code: '1HME15DD002',
-    description: 'Middenklem 30-40mm - Zwart',
-    packagingUnit: 20,
-    category: 'clamps',
+    description: 'DAKHAAK DUBBEL VERSTELBAAR TEGELPAN',
+    packagingUnit: 30,
+    category: 'slanted_roof',
   },
-  KLEM_EIND_30_ALU: {
-    code: '1HME16DD001',
-    description: 'Eindklem 30-40mm - ALU',
-    packagingUnit: 20,
-    category: 'clamps',
+  // Tiled - Hybrid
+  DAKHAAK_HYBRID: {
+    code: '1HME15DD003',
+    description: 'DAKHAAK DUBBEL VERSTELBAAR HYBRIDE',
+    packagingUnit: 30,
+    category: 'slanted_roof',
   },
-  KLEM_EIND_30_BLACK: {
-    code: '1HME16DD002',
-    description: 'Eindklem 30-40mm - Zwart',
-    packagingUnit: 20,
-    category: 'clamps',
+  // Tiled - Optimum
+  DAKHAAK_OPTIMUM: {
+    code: '1HME15DD009',
+    description: 'DAKHAAK DUBBEL VERSTELBAAR OPTIMUM',
+    packagingUnit: 30,
+    category: 'slanted_roof',
   },
-  KLEM_MIDDEN_35_ALU: {
-    code: '1HME17DD001',
-    description: 'Middenklem 35-50mm - ALU',
-    packagingUnit: 20,
-    category: 'clamps',
+  // Tiled - Optimum Classic
+  DAKHAAK_OPTI_CLASSIC: {
+    code: '1HME15DD011',
+    description: 'DAKHAAK DUBBEL VERSTELBAAR OPTIMUM CLASSIC',
+    packagingUnit: 30,
+    category: 'slanted_roof',
   },
-  KLEM_MIDDEN_35_BLACK: {
-    code: '1HME17DD002',
-    description: 'Middenklem 35-50mm - Zwart',
-    packagingUnit: 20,
-    category: 'clamps',
+  // Slates - Normal
+  DAKHAAK_SLATES_NORMAL: {
+    code: '1HME15DE002',
+    description: 'DAKHAAK ENKEL VERSTELBAAR LEI RVS PLAT',
+    packagingUnit: 30,
+    category: 'slanted_roof',
   },
-  KLEM_EIND_35_ALU: {
-    code: '1HME18DD001',
-    description: 'Eindklem 35-50mm - ALU',
-    packagingUnit: 20,
-    category: 'clamps',
+  // Zinc - Round
+  DAKHAAK_ZINC_ROUND: {
+    code: '1HME15DV003',
+    description: 'ZINKEN DAK KLEM ROND',
+    packagingUnit: 50,
+    category: 'slanted_roof',
   },
-  KLEM_EIND_35_BLACK: {
-    code: '1HME18DD002',
-    description: 'Eindklem 35-50mm - Zwart',
-    packagingUnit: 20,
-    category: 'clamps',
+  // Zinc - Stand Seam
+  DAKHAAK_ZINC_STAND_SEAM: {
+    code: '1HME15DV006',
+    description: 'ZINKEN DAK KLEM STAANDE NAAD',
+    packagingUnit: 50,
+    category: 'slanted_roof',
   },
-  
-  // Profielen (Profiles)
-  PROFIEL_HOUSE_4200_ALU: {
-    code: '1HPR01DD001',
-    description: 'House Profiel 4200mm - ALU',
-    packagingUnit: 1,
-    category: 'profiles',
-  },
-  PROFIEL_HOUSE_4200_BLACK: {
-    code: '1HPR01DD002',
-    description: 'House Profiel 4200mm - Zwart',
-    packagingUnit: 1,
-    category: 'profiles',
-  },
+
+  // ===== PROFILES =====
+  // House Profile 6.00M
   PROFIEL_HOUSE_6000_ALU: {
-    code: '1HPR02DD001',
-    description: 'House Profiel 6000mm - ALU',
+    code: '1HME43AL050',
+    description: 'HUISPROFIEL ALLIMEX 6,00M ALU',
     packagingUnit: 1,
     category: 'profiles',
   },
   PROFIEL_HOUSE_6000_BLACK: {
-    code: '1HPR02DD002',
-    description: 'House Profiel 6000mm - Zwart',
+    code: '1HME43ZW041',
+    description: 'HUISPROFIEL ALLIMEX 6,00M ZWART',
     packagingUnit: 1,
     category: 'profiles',
   },
-  PROFIEL_FEATHER_4200_ALU: {
-    code: '1HPR03DD001',
-    description: 'Feather Profiel 4200mm - ALU',
-    packagingUnit: 1,
-    category: 'profiles',
-  },
-  PROFIEL_FEATHER_4200_BLACK: {
-    code: '1HPR03DD002',
-    description: 'Feather Profiel 4200mm - Zwart',
-    packagingUnit: 1,
-    category: 'profiles',
-  },
+  // Feather Profile 6.00M
   PROFIEL_FEATHER_6000_ALU: {
-    code: '1HPR04DD001',
-    description: 'Feather Profiel 6000mm - ALU',
+    code: '1HME43AL035',
+    description: 'PROFIEL FEATHER 6,00M ALU',
     packagingUnit: 1,
     category: 'profiles',
   },
   PROFIEL_FEATHER_6000_BLACK: {
-    code: '1HPR04DD002',
-    description: 'Feather Profiel 6000mm - Zwart',
+    code: '1HME43ZW044',
+    description: 'PROFIEL FEATHER 6,00M ZWART',
     packagingUnit: 1,
     category: 'profiles',
   },
-  
-  // Profile Connectors
-  PROFIEL_CONNECTOR_ALU: {
-    code: '1HPC01DD001',
-    description: 'Profiel Connector - ALU',
+  // Large Span Profile
+  PROFIEL_GROTE_OVERSPANNING: {
+    code: '1HME43AL006',
+    description: 'PROFIEL GROTE OVERSPANNING 80/40 6,20M ALU',
+    packagingUnit: 1,
+    category: 'profiles',
+  },
+
+  // ===== PROFILE CONNECTORS =====
+  PROFIELVERBINDER_ALU: {
+    code: '1HMEACPV001',
+    description: 'PROFIELVERBINDER 40MM ALU',
     packagingUnit: 10,
     category: 'connectors',
   },
-  PROFIEL_CONNECTOR_BLACK: {
-    code: '1HPC01DD002',
-    description: 'Profiel Connector - Zwart',
+  PROFIELVERBINDER_BLACK: {
+    code: '1HMEACPV002',
+    description: 'PROFIELVERBINDER 40MM ZWART',
     packagingUnit: 10,
     category: 'connectors',
   },
-  
-  // Steeldeck Items
-  STEELDECK_PLAATJE_15: {
-    code: '1HSD01DD001',
-    description: 'Steeldeck Plaatje 15cm',
+
+  // ===== CLAMPS - KLIK SYSTEM =====
+  // Middle clamps 30-40mm
+  KLIKMIDDENKLEM_30_40_ALU: {
+    code: '1HME32KK003',
+    description: 'KLIKMIDDENKLEM 30-40MM ALU',
+    packagingUnit: 20,
+    category: 'clamps',
+  },
+  KLIKMIDDENKLEM_30_40_BLACK: {
+    code: '1HME32KK004',
+    description: 'KLIKMIDDENKLEM 30-40MM ZWART',
+    packagingUnit: 20,
+    category: 'clamps',
+  },
+  // End clamps 30mm
+  KLIKEINDKLEM_30_ALU: {
+    code: '1HME32KK024',
+    description: 'KLIKEINDKLEM 30MM ALU',
+    packagingUnit: 20,
+    category: 'clamps',
+  },
+  KLIKEINDKLEM_30_BLACK: {
+    code: '1HME32KK025',
+    description: 'KLIKEINDKLEM 30MM ZWART',
+    packagingUnit: 20,
+    category: 'clamps',
+  },
+  // End clamps 35mm
+  KLIKEINDKLEM_35_ALU: {
+    code: '1HME32KK010',
+    description: 'KLIKEINDKLEM 35MM ALU',
+    packagingUnit: 20,
+    category: 'clamps',
+  },
+  KLIKEINDKLEM_35_BLACK: {
+    code: '1HME32KK016',
+    description: 'KLIKEINDKLEM 35MM ZWART',
+    packagingUnit: 20,
+    category: 'clamps',
+  },
+
+  // ===== CLAMPS - SOLARSPEED (60MM Length) =====
+  // Middle clamps Basic for Solarspeed
+  MIDDENKLEM_BASIC_ALU: {
+    code: '1HME32SR085',
+    description: 'MIDDENKLEM BASIC ALU LENGTE 60MM',
     packagingUnit: 10,
-    category: 'steeldeck',
+    category: 'clamps',
   },
-  STEELDECK_PLAATJE_40: {
-    code: '1HSD01DD002',
-    description: 'Steeldeck Plaatje 40cm',
+  MIDDENKLEM_BASIC_BLACK: {
+    code: '1HME32SR086',
+    description: 'MIDDENKLEM BASIC ZWART LENGTE 60MM',
     packagingUnit: 10,
-    category: 'steeldeck',
+    category: 'clamps',
   },
-  STEELDECK_CONNECTING_PLATE: {
-    code: '1HSD02DD001',
-    description: 'Steeldeck Connecting Plate',
-    packagingUnit: 10,
-    category: 'steeldeck',
+  // End clamps 35mm L60MM
+  EINDKLEM_35_L60_ALU: {
+    code: '1HME32SR071',
+    description: 'EINDKLEM 35MM LENGTE 60MM ALU',
+    packagingUnit: 20,
+    category: 'clamps',
   },
-  STEELDECK_BOUT_M8X30: {
-    code: '1HSD03DD001',
-    description: 'Bout M8x30 RVS',
-    packagingUnit: 100,
-    category: 'steeldeck',
+  EINDKLEM_35_L60_BLACK: {
+    code: '1HME32SR072',
+    description: 'EINDKLEM 35MM LENGTE 60MM ZWART',
+    packagingUnit: 20,
+    category: 'clamps',
   },
-  
-  // Solarspeed Items
-  SOLARSPEED_TRIANGLE_10: {
-    code: '1HSS01DD001',
-    description: 'Solarspeed Triangle 10°',
-    packagingUnit: 1,
-    category: 'solarspeed',
+  // End clamps 30mm L60MM with grounding
+  EINDKLEM_30_L60_ALU: {
+    code: '1HME32SR097',
+    description: 'EINDKLEM 30MM MET AARDING LENGTE 60MM ALU',
+    packagingUnit: 20,
+    category: 'clamps',
   },
-  SOLARSPEED_TRIANGLE_15: {
-    code: '1HSS01DD002',
-    description: 'Solarspeed Triangle 15°',
-    packagingUnit: 1,
-    category: 'solarspeed',
+  EINDKLEM_30_L60_BLACK: {
+    code: '1HME32SR096',
+    description: 'EINDKLEM 30MM MET AARDING LENGTE 60MM ZWART',
+    packagingUnit: 20,
+    category: 'clamps',
   },
-  SOLARSPEED_BASE_RAIL: {
-    code: '1HSS02DD001',
-    description: 'Solarspeed Base Rail 2400mm',
-    packagingUnit: 1,
-    category: 'solarspeed',
+
+  // ===== END CAPS (Sluitstop) =====
+  SLUITSTOP_ALU: {
+    code: '1HMEACPS002',
+    description: 'SLUITSTOP VOOR PROFIEL 40X40 ALU',
+    packagingUnit: 50,
+    category: 'accessories',
   },
-  SOLARSPEED_BALLAST_TRAY: {
-    code: '1HSS03DD001',
-    description: 'Solarspeed Ballast Tray',
-    packagingUnit: 1,
-    category: 'solarspeed',
+  SLUITSTOP_BLACK: {
+    code: '1HME0ACPS001',
+    description: 'SLUITSTOP VOOR PROFIEL 40X40 ZWART',
+    packagingUnit: 50,
+    category: 'accessories',
   },
-  SOLARSPEED_WIND_DEFLECTOR: {
-    code: '1HSS04DD001',
-    description: 'Solarspeed Wind Deflector',
-    packagingUnit: 1,
-    category: 'solarspeed',
-  },
-  
-  // Allfield/Triangle Items
-  ALLFIELD_TRIANGLE_10: {
-    code: '1HAF01DD001',
-    description: 'Allfield Triangle 10°',
-    packagingUnit: 1,
-    category: 'allfield',
-  },
-  ALLFIELD_TRIANGLE_15: {
-    code: '1HAF01DD002',
-    description: 'Allfield Triangle 15°',
-    packagingUnit: 1,
-    category: 'allfield',
-  },
-  ALLFIELD_BASE_SUPPORT: {
-    code: '1HAF02DD001',
-    description: 'Allfield Base Support',
-    packagingUnit: 1,
-    category: 'allfield',
-  },
-  ALLFIELD_CROSS_CONNECTOR: {
-    code: '1HAF03DD001',
-    description: 'Allfield Cross Connector',
-    packagingUnit: 10,
-    category: 'allfield',
-  },
-  ALLFIELD_BALLAST_BLOCK: {
-    code: '1HAF04DD001',
-    description: 'Allfield Ballast Block Holder',
-    packagingUnit: 4,
-    category: 'allfield',
-  },
-  
-  // Hardware / Bevestigingsmateriaal
-  BOUT_M8X20: {
-    code: '1HHW01DD001',
-    description: 'Bout M8x20 RVS A2',
+
+  // ===== BOLTS & SCREWS =====
+  // Wood screws for roof hooks
+  HOUTSCHROEF_6X70: {
+    code: '1HME46HT001',
+    description: 'HOUTSCHROEF 6X70 TX25',
     packagingUnit: 100,
     category: 'hardware',
   },
-  BOUT_M8X25: {
-    code: '1HHW01DD002',
-    description: 'Bout M8x25 RVS A2',
+  HOUTSCHROEF_8X80: {
+    code: '1HME46HT004',
+    description: 'HOUTSCHROEF 8X80 TX40',
     packagingUnit: 100,
     category: 'hardware',
   },
-  BOUT_M8X30: {
-    code: '1HHW01DD003',
-    description: 'Bout M8x30 RVS A2',
+  // Inbus bolts
+  INBUS_BOUT_M8X16: {
+    code: '1HME10BT014',
+    description: 'INBUS BOUT M8X16',
     packagingUnit: 100,
     category: 'hardware',
   },
-  BOUT_M10X25: {
-    code: '1HHW02DD001',
-    description: 'Bout M10x25 RVS A2',
+  INBUS_BOUT_M8X30: {
+    code: '1HME10BT019',
+    description: 'INBUS BOUT M8X30',
     packagingUnit: 100,
     category: 'hardware',
   },
-  BOUT_M10X30: {
-    code: '1HHW02DD002',
-    description: 'Bout M10x30 RVS A2',
+  // Hex bolts
+  ZESKANT_BOUT_M10X30: {
+    code: '1HME10BT037',
+    description: 'ZESKANT BOUT M10X30',
     packagingUnit: 100,
     category: 'hardware',
   },
-  MOER_M8: {
-    code: '1HHW03DD001',
-    description: 'Moer M8 RVS A2',
+  ZESKANT_BOUT_M16X35: {
+    code: '1HME10BT043',
+    description: 'ZESKANT BOUT M16X35',
     packagingUnit: 100,
     category: 'hardware',
   },
-  MOER_M10: {
-    code: '1HHW03DD002',
-    description: 'Moer M10 RVS A2',
+  // Bi-metal screws for steeldeck
+  BIMETAL_SCHROEF_6X25: {
+    code: '1HME46BM003',
+    description: 'BI-METAL SCHROEVEN VOOR STEELDECKPLAATJE 6,0 X 25',
+    packagingUnit: 100,
+    category: 'hardware',
+  },
+  // Plate screws for solarspeed
+  PLAATSCHROEF_6_5X19: {
+    code: '1HME46PL001',
+    description: 'PLAATSCHROEF 6,5X19 VOOR SOLARSPEED',
+    packagingUnit: 100,
+    category: 'hardware',
+  },
+
+  // ===== NUTS & WASHERS =====
+  KARTELMOER_M10: {
+    code: '1HME10MR001',
+    description: 'KARTELMOER M10',
+    packagingUnit: 100,
+    category: 'hardware',
+  },
+  KLIKMOER_M8: {
+    code: '1HME10MR004',
+    description: 'KLIKMOER M8',
     packagingUnit: 100,
     category: 'hardware',
   },
   RONDEL_M8: {
-    code: '1HHW04DD001',
-    description: 'Rondel M8 RVS A2',
+    code: '1HME10RD001',
+    description: 'RONDEL M8',
     packagingUnit: 100,
     category: 'hardware',
   },
-  RONDEL_M10: {
-    code: '1HHW04DD002',
-    description: 'Rondel M10 RVS A2',
+  RONDEL_M16: {
+    code: '1HME10RD004',
+    description: 'RONDEL M16 17MM',
     packagingUnit: 100,
     category: 'hardware',
   },
-  T_BOUT_M8: {
-    code: '1HHW05DD001',
-    description: 'T-Bout M8x40',
-    packagingUnit: 50,
-    category: 'hardware',
-  },
-  HAMERKOP_BOUT: {
-    code: '1HHW06DD001',
-    description: 'Hamerkop Bout M8x25',
-    packagingUnit: 50,
-    category: 'hardware',
-  },
-  
-  // Cable Management
-  KABELGOOT: {
-    code: '1HCM01DD001',
-    description: 'Kabelgoot 2000mm',
+
+  // ===== L-STUK (For mounting) =====
+  L_STUK_DAKHAAK: {
+    code: '1HME15AC003',
+    description: 'L-STUK DAKHAAK',
     packagingUnit: 1,
-    category: 'cable_management',
+    category: 'accessories',
   },
-  KABELCLIP: {
-    code: '1HCM02DD001',
-    description: 'Kabelclip voor Profiel',
-    packagingUnit: 100,
-    category: 'cable_management',
+
+  // ===== STEELDECK PLATES =====
+  STEELDECK_PLAATJE_15CM: {
+    code: '1HME15SD005',
+    description: 'STEELDECK PLAATJE MET EPDM - LANDSCAPE -15CM',
+    packagingUnit: 35,
+    category: 'steeldeck',
   },
-  
-  // Ground Mount Specific
-  GM_PAAL_CONNECTOR: {
-    code: '1HGM02DD001',
-    description: 'Grondmontage Paal Connector',
+  STEELDECK_PLAATJE_40CM: {
+    code: '1HME15SD006',
+    description: 'STEELDECKPLAAT met EPDM ALU 40CM',
+    packagingUnit: 35,
+    category: 'steeldeck',
+  },
+
+  // ===== L-PROFILE (Support) =====
+  L_PROFIEL_6M: {
+    code: '1HFR43AL002',
+    description: 'L-PROFIEL 40X40X3MM 6,00M ALU',
     packagingUnit: 1,
-    category: 'ground_mount',
+    category: 'profiles',
   },
-  GM_PROFIEL_SUPPORT: {
-    code: '1HGM03DD001',
-    description: 'Grondmontage Profiel Support',
+
+  // ===== GROUND MOUNT (Schroefpalen) =====
+  SCHROEFPAAL_750: {
+    code: '1FLD45GA002',
+    description: 'SCHROEFPAAL 750MM GALVA',
     packagingUnit: 1,
     category: 'ground_mount',
   },
-  GM_CROSS_BAR: {
-    code: '1HGM04DD001',
-    description: 'Grondmontage Cross Bar',
+  SCHROEFPAAL_1000: {
+    code: '1FLD45GA005',
+    description: 'SCHROEFPAAL 1000MM GALVA',
     packagingUnit: 1,
     category: 'ground_mount',
+  },
+  SCHROEFPAAL_1500: {
+    code: '1FLD45GA004',
+    description: 'SCHROEFPAAL 1500MM GALVA',
+    packagingUnit: 1,
+    category: 'ground_mount',
+  },
+  SCHROEFPAAL_RVS_PLAATJE: {
+    code: '1FLD45AC001',
+    description: 'SCHROEFPAAL RVS PLAATJE SCHANS ACCESSOIRE',
+    packagingUnit: 1,
+    category: 'ground_mount',
+  },
+
+  // ===== ALLFIELD / TRIANGLE =====
+  VERSTELBARE_SCHANS_S: {
+    code: '1FLD19ZZ001',
+    description: 'VERSTELBARE SCHANS - S - 1PT/2LS',
+    packagingUnit: 1,
+    category: 'allfield',
+  },
+  VERSTELBARE_SCHANS_M: {
+    code: '1FLD19ZZ002',
+    description: 'VERSTELBARE SCHANS - M - 2PT/3LS',
+    packagingUnit: 1,
+    category: 'allfield',
+  },
+  VERSTELBARE_SCHANS_L: {
+    code: '1FLD19ZZ003',
+    description: 'VERSTELBARE SCHANS - L - 4LS',
+    packagingUnit: 1,
+    category: 'allfield',
+  },
+  VERSTELBARE_SCHANS_XL: {
+    code: '1FLD19ZZ004',
+    description: 'VERSTELBARE SCHANS - XL - 3PT/5LS',
+    packagingUnit: 1,
+    category: 'allfield',
+  },
+
+  // ===== SOLARSPEED =====
+  SOLARSPEED_EW_1020: {
+    code: '1SSP19EW017',
+    description: 'SOLARSPEED 3.0 OOST-WEST LANDSCAPE 1020MM (PAN.1101/1140) 12,5° STEEK 2450MM +RUBBER +TUBTARA',
+    packagingUnit: 1,
+    category: 'solarspeed',
+  },
+  SOLARSPEED_SOUTH_10_1500: {
+    code: '1SSP19NZ020',
+    description: 'SOLARSPEED 3.0 NOORD-ZUID LANDSCAPE 10° STEEK 1500MM +RUBBER + TUBTARA',
+    packagingUnit: 1,
+    category: 'solarspeed',
+  },
+  SOLARSPEED_SOUTH_12_5_1600: {
+    code: '1SSP19NZ023',
+    description: 'SOLARSPEED 3.0 NOORD-ZUID LANDSCAPE 12,5° STEEK 1600MM +RUBBER +TUBTARA',
+    packagingUnit: 1,
+    category: 'solarspeed',
+  },
+  KOPPELSTUK_L_BALLAST: {
+    code: '1SSP99AC030',
+    description: 'KOPPELSTUK SOLARSPEED L-BALLAST 40MM MET RUBBER',
+    packagingUnit: 1,
+    category: 'solarspeed',
+  },
+  DRUKNAGEL_SOLARSPEED: {
+    code: '1SSP99AC034',
+    description: 'DRUKNAGEL SOLARSPEED',
+    packagingUnit: 1,
+    category: 'solarspeed',
+  },
+  EINDRUBBER_SOLARSPEED: {
+    code: '1SSP99AC038',
+    description: 'EINDRUBBER SOLARSPEED',
+    packagingUnit: 1,
+    category: 'solarspeed',
+  },
+
+  // ===== SOLARSPEED L-PROFILES =====
+  SOLARSPEED_L_PROFILE_1200: {
+    code: '1SSP99AC081',
+    description: 'SOLARSPEED L-PROFILE 1131/1204 - 1200MM - SET OF 2',
+    packagingUnit: 1,
+    category: 'solarspeed',
+  },
+  SOLARSPEED_L_PROFILE_1345: {
+    code: '1SSP99AC107',
+    description: 'SOLARSPEED L-PROFILE 1305/1350 - 1345MM - SET OF 2',
+    packagingUnit: 1,
+    category: 'solarspeed',
+  },
+  SOLARSPEED_L_PROFILE_1805: {
+    code: '1SSP99AC077',
+    description: 'SOLARSPEED L-PROFILE 1731/1810 - 1805MM - SET OF 2',
+    packagingUnit: 1,
+    category: 'solarspeed',
+  },
+  SOLARSPEED_L_PROFILE_1885: {
+    code: '1SSP99AC082',
+    description: 'SOLARSPEED L-PROFILE 1811/1890 - 1885MM - SET OF 2',
+    packagingUnit: 1,
+    category: 'solarspeed',
+  },
+  SOLARSPEED_L_PROFILE_1965: {
+    code: '1SSP99AC083',
+    description: 'SOLARSPEED L-PROFILE 1891/1970 - 1965MM - SET OF 2',
+    packagingUnit: 1,
+    category: 'solarspeed',
+  },
+  SOLARSPEED_L_PROFILE_2045: {
+    code: '1SSP99AC084',
+    description: 'SOLARSPEED L-PROFILE 1971/2050 - 2045MM - SET OF 2',
+    packagingUnit: 1,
+    category: 'solarspeed',
+  },
+  SOLARSPEED_L_PROFILE_2125: {
+    code: '1SSP99AC079',
+    description: 'SOLARSPEED L-PROFILE 2051/2130 - 2125MM - SET OF 2',
+    packagingUnit: 1,
+    category: 'solarspeed',
+  },
+  SOLARSPEED_L_PROFILE_2205: {
+    code: '1SSP99AC080',
+    description: 'SOLARSPEED L-PROFILE 2131/2210 - 2205MM - SET OF 2',
+    packagingUnit: 1,
+    category: 'solarspeed',
+  },
+  SOLARSPEED_L_PROFILE_2285: {
+    code: '1SSP99AC101',
+    description: 'SOLARSPEED L-PROFILE 2211/2290 - 2285MM - SET OF 2',
+    packagingUnit: 1,
+    category: 'solarspeed',
+  },
+
+  // ===== SOLARSPEED BACKPLATES =====
+  SOLARSPEED_BACKPLATE_1805: {
+    code: '1SSP99AC086',
+    description: 'SOLARSPEED 3.0 LANDSCAPE BACKPLATE 10°-12,5°-15° 1805MM',
+    packagingUnit: 1,
+    category: 'solarspeed',
+  },
+  SOLARSPEED_BACKPLATE_1885: {
+    code: '1SSP99AC090',
+    description: 'SOLARSPEED 3.0 LANDSCAPE BACKPLATE 10°-12,5°-15° 1885MM',
+    packagingUnit: 1,
+    category: 'solarspeed',
+  },
+  SOLARSPEED_BACKPLATE_1965: {
+    code: '1SSP99AC091',
+    description: 'SOLARSPEED 3.0 LANDSCAPE BACKPLATE 10°-12,5°-15° 1965MM',
+    packagingUnit: 1,
+    category: 'solarspeed',
+  },
+  SOLARSPEED_BACKPLATE_2045: {
+    code: '1SSP99AC087',
+    description: 'SOLARSPEED 3.0 LANDSCAPE BACKPLATE 10°-12,5°-15° 2045MM',
+    packagingUnit: 1,
+    category: 'solarspeed',
+  },
+  SOLARSPEED_BACKPLATE_2125: {
+    code: '1SSP99AC088',
+    description: 'SOLARSPEED 3.0 LANDSCAPE BACKPLATE 10°-12,5°-15° 2125MM',
+    packagingUnit: 1,
+    category: 'solarspeed',
+  },
+  SOLARSPEED_BACKPLATE_2205: {
+    code: '1SSP99AC089',
+    description: 'SOLARSPEED 3.0 LANDSCAPE BACKPLATE 10°-12,5°-15° 2205MM',
+    packagingUnit: 1,
+    category: 'solarspeed',
+  },
+  SOLARSPEED_BACKPLATE_2280: {
+    code: '1SSP99AC100',
+    description: 'SOLARSPEED 3.0 LANDSCAPE BACKPLATE 10°-12,5°-15° 2280MM',
+    packagingUnit: 1,
+    category: 'solarspeed',
+  },
+
+  // ===== EQUIPMENT RENTAL =====
+  BOORMACHINE_HUUR: {
+    code: '8ZZZBM99005',
+    description: 'ELECTRISCH GEREEDSCHAP BOORMACHINE HUUR PER DAG',
+    packagingUnit: 1,
+    category: 'equipment',
   },
 };
 
@@ -457,7 +647,55 @@ export const getProduct = (key: string): Product | undefined => {
   return PRODUCTS[key];
 };
 
-// Helper function to calculate packaging
+// Helper function to calculate packaging (round up to packaging unit)
 export const calculatePackaging = (required: number, packagingUnit: number): number => {
+  if (required === 0) return 0;
   return Math.ceil(required / packagingUnit) * packagingUnit;
+};
+
+// Get roof hook product by hook type
+export const getRoofHookProduct = (hookType: HookType): Product | undefined => {
+  const hookProductMap: Record<HookType, string> = {
+    [HOOK_TYPES.NORMAL]: 'DAKHAAK_NORMAL',
+    [HOOK_TYPES.LONG]: 'DAKHAAK_LONG',
+    [HOOK_TYPES.HYBRID]: 'DAKHAAK_HYBRID',
+    [HOOK_TYPES.OPTIMUM]: 'DAKHAAK_OPTIMUM',
+    [HOOK_TYPES.OPTI_CLASSIC]: 'DAKHAAK_OPTI_CLASSIC',
+    [HOOK_TYPES.SLATES_NORMAL]: 'DAKHAAK_SLATES_NORMAL',
+    [HOOK_TYPES.ZINC_ROUND]: 'DAKHAAK_ZINC_ROUND',
+    [HOOK_TYPES.ZINC_STAND_SEAM]: 'DAKHAAK_ZINC_STAND_SEAM',
+  };
+  return PRODUCTS[hookProductMap[hookType]];
+};
+
+// Get profile product based on type and color
+export const getProfileProduct = (profileType: ProfileType, color: ProfileColor): Product | undefined => {
+  const key = profileType === PROFILE_TYPES.HOUSE
+    ? (color === PROFILE_COLORS.ALU ? 'PROFIEL_HOUSE_6000_ALU' : 'PROFIEL_HOUSE_6000_BLACK')
+    : (color === PROFILE_COLORS.ALU ? 'PROFIEL_FEATHER_6000_ALU' : 'PROFIEL_FEATHER_6000_BLACK');
+  return PRODUCTS[key];
+};
+
+// Get profile connector based on color
+export const getProfileConnector = (color: ProfileColor): Product => {
+  return color === PROFILE_COLORS.ALU ? PRODUCTS.PROFIELVERBINDER_ALU : PRODUCTS.PROFIELVERBINDER_BLACK;
+};
+
+// Get middle clamp (klik system)
+export const getMiddleClamp = (color: ProfileColor): Product => {
+  return color === PROFILE_COLORS.ALU ? PRODUCTS.KLIKMIDDENKLEM_30_40_ALU : PRODUCTS.KLIKMIDDENKLEM_30_40_BLACK;
+};
+
+// Get end clamp based on thickness and color
+export const getEndClamp = (thickness: number, color: ProfileColor): Product => {
+  if (thickness <= 32) {
+    return color === PROFILE_COLORS.ALU ? PRODUCTS.KLIKEINDKLEM_30_ALU : PRODUCTS.KLIKEINDKLEM_30_BLACK;
+  } else {
+    return color === PROFILE_COLORS.ALU ? PRODUCTS.KLIKEINDKLEM_35_ALU : PRODUCTS.KLIKEINDKLEM_35_BLACK;
+  }
+};
+
+// Get end cap (sluitstop) based on color
+export const getEndCap = (color: ProfileColor): Product => {
+  return color === PROFILE_COLORS.ALU ? PRODUCTS.SLUITSTOP_ALU : PRODUCTS.SLUITSTOP_BLACK;
 };

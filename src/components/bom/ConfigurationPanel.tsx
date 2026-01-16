@@ -12,13 +12,19 @@ import { PanelConfig, RoofConfig } from '@/types/bom';
 import {
   ROOF_TYPES,
   ROOF_TYPE_LABELS,
-  HOOK_TYPES,
+  ROOFING_TYPES,
+  ROOFING_TYPE_LABELS,
+  HOOKS_BY_ROOFING,
   HOOK_TYPE_LABELS,
+  PROFILE_TYPES,
+  PROFILE_TYPE_LABELS,
   PROFILE_COLORS,
   PROFILE_COLOR_LABELS,
   ANGLE_OPTIONS,
   RoofType,
+  RoofingType,
   HookType,
+  ProfileType,
   ProfileColor,
 } from '@/data/products';
 import { Settings2, Sun, Ruler, Grid3X3 } from 'lucide-react';
@@ -36,13 +42,19 @@ export const ConfigurationPanel = ({
   onPanelConfigChange,
   onRoofConfigChange,
 }: ConfigurationPanelProps) => {
-  const showHookType = roofConfig.roofType === ROOF_TYPES.SLANTED_ROOF;
+  const isSlantedRoof = roofConfig.roofType === ROOF_TYPES.SLANTED_ROOF;
   const showAngle = (
     roofConfig.roofType === ROOF_TYPES.ALLFIELD_LANDSCAPE ||
     roofConfig.roofType === ROOF_TYPES.ALLFIELD_PORTRAIT ||
     roofConfig.roofType === ROOF_TYPES.SOLARSPEED_EW ||
-    roofConfig.roofType === ROOF_TYPES.SOLARSPEED_SOUTH
+    roofConfig.roofType === ROOF_TYPES.SOLARSPEED_SOUTH ||
+    roofConfig.roofType === ROOF_TYPES.FLAT_ROOF_TRIANGLE
   );
+
+  // Get available hook types based on selected roofing type
+  const availableHooks = isSlantedRoof && roofConfig.roofingType 
+    ? HOOKS_BY_ROOFING[roofConfig.roofingType] || []
+    : [];
 
   return (
     <div className="space-y-6">
@@ -51,20 +63,25 @@ export const ConfigurationPanel = ({
         <CardHeader className="pb-4">
           <CardTitle className="flex items-center gap-2 text-lg">
             <Settings2 className="h-5 w-5 text-primary" />
-            Daktype Selectie
+            System Configuration
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="roofType">Type Montagesysteem</Label>
+            <Label htmlFor="roofType">Mounting System Type</Label>
             <Select
               value={roofConfig.roofType}
               onValueChange={(value: RoofType) =>
-                onRoofConfigChange({ ...roofConfig, roofType: value })
+                onRoofConfigChange({ 
+                  ...roofConfig, 
+                  roofType: value,
+                  roofingType: value === ROOF_TYPES.SLANTED_ROOF ? ROOFING_TYPES.TILED : undefined,
+                  hookType: undefined,
+                })
               }
             >
               <SelectTrigger id="roofType" className="w-full">
-                <SelectValue placeholder="Selecteer daktype" />
+                <SelectValue placeholder="Select system type" />
               </SelectTrigger>
               <SelectContent>
                 {Object.entries(ROOF_TYPE_LABELS).map(([key, label]) => (
@@ -76,32 +93,82 @@ export const ConfigurationPanel = ({
             </Select>
           </div>
 
-          {showHookType && (
-            <div className="space-y-2">
-              <Label htmlFor="hookType">Dakhaak Type</Label>
-              <Select
-                value={roofConfig.hookType || HOOK_TYPES.NORMAL}
-                onValueChange={(value: HookType) =>
-                  onRoofConfigChange({ ...roofConfig, hookType: value })
-                }
-              >
-                <SelectTrigger id="hookType" className="w-full">
-                  <SelectValue placeholder="Selecteer dakhaak type" />
-                </SelectTrigger>
-                <SelectContent>
-                  {Object.entries(HOOK_TYPE_LABELS).map(([key, label]) => (
-                    <SelectItem key={key} value={key}>
-                      {label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+          {/* Slanted Roof Options */}
+          {isSlantedRoof && (
+            <>
+              <div className="space-y-2">
+                <Label htmlFor="roofingType">Roofing Material</Label>
+                <Select
+                  value={roofConfig.roofingType || ROOFING_TYPES.TILED}
+                  onValueChange={(value: RoofingType) => {
+                    const hooks = HOOKS_BY_ROOFING[value];
+                    onRoofConfigChange({ 
+                      ...roofConfig, 
+                      roofingType: value,
+                      hookType: hooks && hooks.length > 0 ? hooks[0] : undefined,
+                    });
+                  }}
+                >
+                  <SelectTrigger id="roofingType" className="w-full">
+                    <SelectValue placeholder="Select roofing type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {Object.entries(ROOFING_TYPE_LABELS).map(([key, label]) => (
+                      <SelectItem key={key} value={key}>
+                        {label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="hookType">Roof Hook Type</Label>
+                <Select
+                  value={roofConfig.hookType || (availableHooks[0] ?? '')}
+                  onValueChange={(value: HookType) =>
+                    onRoofConfigChange({ ...roofConfig, hookType: value })
+                  }
+                >
+                  <SelectTrigger id="hookType" className="w-full">
+                    <SelectValue placeholder="Select hook type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {availableHooks.map((hookKey) => (
+                      <SelectItem key={hookKey} value={hookKey}>
+                        {HOOK_TYPE_LABELS[hookKey]}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="profileType">Profile Type</Label>
+                <Select
+                  value={roofConfig.profileType || PROFILE_TYPES.HOUSE}
+                  onValueChange={(value: ProfileType) =>
+                    onRoofConfigChange({ ...roofConfig, profileType: value })
+                  }
+                >
+                  <SelectTrigger id="profileType" className="w-full">
+                    <SelectValue placeholder="Select profile type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {Object.entries(PROFILE_TYPE_LABELS).map(([key, label]) => (
+                      <SelectItem key={key} value={key}>
+                        {label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </>
           )}
 
           {showAngle && (
             <div className="space-y-2">
-              <Label htmlFor="angle">Hellingshoek</Label>
+              <Label htmlFor="angle">Tilt Angle</Label>
               <Select
                 value={roofConfig.angle.toString()}
                 onValueChange={(value) =>
@@ -109,7 +176,7 @@ export const ConfigurationPanel = ({
                 }
               >
                 <SelectTrigger id="angle" className="w-full">
-                  <SelectValue placeholder="Selecteer hoek" />
+                  <SelectValue placeholder="Select angle" />
                 </SelectTrigger>
                 <SelectContent>
                   {ANGLE_OPTIONS.map((angle) => (
@@ -124,7 +191,7 @@ export const ConfigurationPanel = ({
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="profileColor">Profiel Kleur</Label>
+              <Label htmlFor="profileColor">Profile Color</Label>
               <Select
                 value={roofConfig.profileColor}
                 onValueChange={(value: ProfileColor) =>
@@ -145,7 +212,7 @@ export const ConfigurationPanel = ({
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="clampColor">Klem Kleur</Label>
+              <Label htmlFor="clampColor">Clamp Color</Label>
               <Select
                 value={roofConfig.clampColor}
                 onValueChange={(value: ProfileColor) =>
@@ -173,12 +240,12 @@ export const ConfigurationPanel = ({
         <CardHeader className="pb-4">
           <CardTitle className="flex items-center gap-2 text-lg">
             <Sun className="h-5 w-5 text-primary" />
-            Paneel Configuratie
+            Panel Configuration
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="orientation">Oriëntatie</Label>
+            <Label htmlFor="orientation">Orientation</Label>
             <Select
               value={panelConfig.orientation}
               onValueChange={(value: 'landscape' | 'portrait') =>
@@ -189,8 +256,8 @@ export const ConfigurationPanel = ({
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="landscape">Liggend (Landscape)</SelectItem>
-                <SelectItem value="portrait">Staand (Portrait)</SelectItem>
+                <SelectItem value="landscape">Landscape</SelectItem>
+                <SelectItem value="portrait">Portrait</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -202,13 +269,13 @@ export const ConfigurationPanel = ({
         <CardHeader className="pb-4">
           <CardTitle className="flex items-center gap-2 text-lg">
             <Ruler className="h-5 w-5 text-primary" />
-            Paneel Afmetingen
+            Panel Dimensions
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid grid-cols-3 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="height">Hoogte (mm)</Label>
+              <Label htmlFor="height">Height (mm)</Label>
               <Input
                 id="height"
                 type="number"
@@ -224,7 +291,7 @@ export const ConfigurationPanel = ({
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="width">Breedte (mm)</Label>
+              <Label htmlFor="width">Width (mm)</Label>
               <Input
                 id="width"
                 type="number"
@@ -240,7 +307,7 @@ export const ConfigurationPanel = ({
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="thickness">Dikte (mm)</Label>
+              <Label htmlFor="thickness">Thickness (mm)</Label>
               <Input
                 id="thickness"
                 type="number"
@@ -251,7 +318,7 @@ export const ConfigurationPanel = ({
                     thickness: parseInt(e.target.value) || 0,
                   })
                 }
-                placeholder="35"
+                placeholder="30"
                 min={0}
               />
             </div>
@@ -264,13 +331,13 @@ export const ConfigurationPanel = ({
         <CardHeader className="pb-4">
           <CardTitle className="flex items-center gap-2 text-lg">
             <Grid3X3 className="h-5 w-5 text-primary" />
-            Paneel Layout
+            Panel Layout
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="rows">Aantal Rijen</Label>
+              <Label htmlFor="rows">Number of Rows</Label>
               <Input
                 id="rows"
                 type="number"
@@ -281,12 +348,12 @@ export const ConfigurationPanel = ({
                     rows: parseInt(e.target.value) || 0,
                   })
                 }
-                placeholder="2"
+                placeholder="5"
                 min={1}
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="columns">Aantal Kolommen</Label>
+              <Label htmlFor="columns">Number of Columns</Label>
               <Input
                 id="columns"
                 type="number"
@@ -297,14 +364,14 @@ export const ConfigurationPanel = ({
                     columns: parseInt(e.target.value) || 0,
                   })
                 }
-                placeholder="4"
+                placeholder="7"
                 min={1}
               />
             </div>
           </div>
 
           <div className="rounded-lg bg-muted/50 p-4 text-center">
-            <p className="text-sm text-muted-foreground">Totaal aantal panelen</p>
+            <p className="text-sm text-muted-foreground">Total Panels</p>
             <p className="text-3xl font-bold text-primary">
               {panelConfig.rows * panelConfig.columns}
             </p>
